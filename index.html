@@ -2,60 +2,72 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>JLPT N4 漢字学習アプリ</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .kanji-text {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
         }
+        @media (orientation: portrait) {
+            body {
+                transform: rotate(90deg);
+                transform-origin: center center;
+                width: 100vh;
+                height: 100vw;
+                overflow-x: hidden;
+                position: absolute;
+                top: 0;
+                left: 0;
+            }
+        }
     </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen p-4">
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen p-2">
     <div class="max-w-2xl mx-auto">
-        <div class="bg-white rounded-2xl shadow-xl p-8 mb-4">
-            <div class="flex items-center justify-between mb-6">
-                <div class="flex items-center gap-3">
-                    <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="bg-white rounded-xl shadow-xl p-4 mb-2">
+            <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                     </svg>
-                    <h1 class="text-3xl font-bold text-gray-800">JLPT N4 漢字</h1>
+                    <h1 class="text-xl font-bold text-gray-800">JLPT N4 漢字</h1>
                 </div>
-                <button onclick="reset()" class="p-2 hover:bg-gray-100 rounded-lg transition">
-                    <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <button onclick="reset()" class="p-1.5 hover:bg-gray-100 rounded-lg transition">
+                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                     </svg>
                 </button>
             </div>
 
-            <div class="flex gap-2 mb-6">
-                <button id="learnBtn" onclick="setMode('learn')" class="flex-1 py-2 px-4 rounded-lg font-medium transition bg-indigo-600 text-white">
+            <div class="flex gap-2 mb-3">
+                <button id="learnBtn" onclick="setMode('learn')" class="flex-1 py-1.5 px-3 rounded-lg text-sm font-medium transition bg-indigo-600 text-white">
                     学習モード
                 </button>
-                <button id="quizBtn" onclick="setMode('quiz')" class="flex-1 py-2 px-4 rounded-lg font-medium transition bg-gray-100 text-gray-700 hover:bg-gray-200">
+                <button id="quizBtn" onclick="setMode('quiz')" class="flex-1 py-1.5 px-3 rounded-lg text-sm font-medium transition bg-gray-100 text-gray-700 hover:bg-gray-200">
                     クイズモード
                 </button>
             </div>
 
-            <div class="mb-6">
-                <div class="flex justify-between text-sm text-gray-600 mb-2">
+            <div class="mb-3">
+                <div class="flex justify-between text-xs text-gray-600 mb-1">
                     <span id="progress"></span>
                     <span id="scoreDisplay"></span>
                 </div>
-                <div class="w-full bg-gray-200 rounded-full h-2">
-                    <div id="progressBar" class="bg-indigo-600 h-2 rounded-full transition-all duration-300" style="width: 2%"></div>
+                <div class="w-full bg-gray-200 rounded-full h-1.5">
+                    <div id="progressBar" class="bg-indigo-600 h-1.5 rounded-full transition-all duration-300" style="width: 2%"></div>
                 </div>
             </div>
 
-            <div class="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-xl p-12 mb-6 text-center">
-                <div id="kanjiDisplay" class="text-8xl font-bold text-indigo-900 mb-6 kanji-text"></div>
-                <div id="answerDisplay" class="space-y-3"></div>
+            <div class="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-xl p-6 mb-3 text-center">
+                <div id="kanjiDisplay" class="text-5xl font-bold text-indigo-900 mb-3 kanji-text"></div>
+                <div id="answerDisplay" class="space-y-2"></div>
             </div>
 
             <div id="controls"></div>
         </div>
 
-        <div class="bg-white rounded-xl shadow-lg p-4 text-center text-sm text-gray-600">
+        <div class="bg-white rounded-lg shadow-lg p-2 text-center text-xs text-gray-600">
             <p>全50単語 | JLPT N4レベル</p>
         </div>
     </div>
@@ -150,8 +162,8 @@
 
             if (mode === 'learn' || showAnswer) {
                 document.getElementById('answerDisplay').innerHTML = `
-                    <div class="text-3xl text-indigo-700 font-medium kanji-text">${current.reading}</div>
-                    <div class="text-xl text-gray-700 kanji-text">${current.meaning}</div>
+                    <div class="text-xl text-indigo-700 font-medium kanji-text">${current.reading}</div>
+                    <div class="text-sm text-gray-700 kanji-text">${current.meaning}</div>
                 `;
             } else {
                 document.getElementById('answerDisplay').innerHTML = '';
@@ -165,13 +177,13 @@
             
             if (mode === 'learn') {
                 controls.innerHTML = `
-                    <div class="flex gap-3">
+                    <div class="flex gap-2">
                         <button onclick="prevKanji()" ${currentIndex === 0 ? 'disabled' : ''} 
-                            class="flex-1 py-3 px-6 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition">
+                            class="flex-1 py-2 px-4 text-sm bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition">
                             前へ
                         </button>
                         <button onclick="nextKanji()" ${currentIndex === kanjiData.length - 1 ? 'disabled' : ''} 
-                            class="flex-1 py-3 px-6 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition">
+                            class="flex-1 py-2 px-4 text-sm bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition">
                             次へ
                         </button>
                     </div>
@@ -179,12 +191,12 @@
             } else {
                 if (!showAnswer) {
                     controls.innerHTML = `
-                        <div class="space-y-3">
-                            <p class="text-center text-gray-600 mb-4 kanji-text">この漢字の読み方は？</p>
-                            <div class="grid grid-cols-2 gap-3">
+                        <div class="space-y-2">
+                            <p class="text-center text-sm text-gray-600 mb-2 kanji-text">この漢字の読み方は？</p>
+                            <div class="grid grid-cols-2 gap-2">
                                 ${quizOptions.map(option => `
                                     <button onclick="handleAnswer('${option}')" 
-                                        class="py-4 px-6 bg-indigo-100 text-indigo-900 rounded-lg font-medium hover:bg-indigo-200 transition text-xl kanji-text">
+                                        class="py-2 px-4 text-base bg-indigo-100 text-indigo-900 rounded-lg font-medium hover:bg-indigo-200 transition kanji-text">
                                         ${option}
                                     </button>
                                 `).join('')}
@@ -194,20 +206,20 @@
                 } else if (selectedAnswer === kanjiData[currentIndex].reading) {
                     controls.innerHTML = `
                         <div class="text-center">
-                            <div class="text-2xl font-bold text-green-600 kanji-text">正解！</div>
+                            <div class="text-lg font-bold text-green-600 kanji-text">正解！</div>
                         </div>
                     `;
                 } else {
                     controls.innerHTML = `
-                        <div class="space-y-4">
+                        <div class="space-y-2">
                             <div class="text-center">
-                                <div class="text-2xl font-bold text-red-600 mb-2 kanji-text">不正解</div>
-                                <div class="text-xl text-gray-700 mb-4 kanji-text">
+                                <div class="text-lg font-bold text-red-600 mb-1 kanji-text">不正解</div>
+                                <div class="text-base text-gray-700 mb-2 kanji-text">
                                     正解: <span class="text-indigo-700 font-semibold">${kanjiData[currentIndex].reading}</span>
                                 </div>
                             </div>
                             <button onclick="retryQuestion()" 
-                                class="w-full py-3 px-6 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition">
+                                class="w-full py-2 px-4 text-sm bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition">
                                 もう一度挑戦
                             </button>
                         </div>
@@ -226,12 +238,12 @@
             }
             
             document.getElementById('learnBtn').className = mode === 'learn' 
-                ? 'flex-1 py-2 px-4 rounded-lg font-medium transition bg-indigo-600 text-white'
-                : 'flex-1 py-2 px-4 rounded-lg font-medium transition bg-gray-100 text-gray-700 hover:bg-gray-200';
+                ? 'flex-1 py-1.5 px-3 rounded-lg text-sm font-medium transition bg-indigo-600 text-white'
+                : 'flex-1 py-1.5 px-3 rounded-lg text-sm font-medium transition bg-gray-100 text-gray-700 hover:bg-gray-200';
             
             document.getElementById('quizBtn').className = mode === 'quiz'
-                ? 'flex-1 py-2 px-4 rounded-lg font-medium transition bg-indigo-600 text-white'
-                : 'flex-1 py-2 px-4 rounded-lg font-medium transition bg-gray-100 text-gray-700 hover:bg-gray-200';
+                ? 'flex-1 py-1.5 px-3 rounded-lg text-sm font-medium transition bg-indigo-600 text-white'
+                : 'flex-1 py-1.5 px-3 rounded-lg text-sm font-medium transition bg-gray-100 text-gray-700 hover:bg-gray-200';
             
             updateDisplay();
         }
@@ -255,12 +267,12 @@
         function handleAnswer(answer) {
             selectedAnswer = answer;
             const isCorrect = answer === kanjiData[currentIndex].reading;
-            score.correct += isCorrect ? 1 : 0;
-            score.total += 1;
             showAnswer = true;
             updateDisplay();
             
             if (isCorrect) {
+                score.correct += 1;
+                score.total += 1;
                 setTimeout(() => {
                     if (currentIndex < kanjiData.length - 1) {
                         currentIndex++;
@@ -270,6 +282,8 @@
                         updateDisplay();
                     }
                 }, 800);
+            } else {
+                score.total += 1;
             }
         }
 
