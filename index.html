@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>JLPT N4 文法模擬試験</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body{
+  margin:0;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
+  background:linear-gradient(135deg,#eff6ff,#e0e7ff);
+}
+.container{max-width:1000px;margin:auto;padding:16px}
+.card{
+  background:#fff;
+  border-radius:16px;
+  padding:24px;
+  margin-bottom:16px;
+  box-shadow:0 10px 20px rgba(0,0,0,.08)
+}
+h1,h2{margin-top:0}
+.test-btn{
+  padding:8px 14px;
+  border-radius:10px;
+  border:none;
+  background:#e5e7eb;
+  margin-right:6px;
+  cursor:pointer
+}
+.test-btn.active{background:#4f46e5;color:#fff}
+.option{
+  width:100%;
+  text-align:left;
+  border:2px solid #d1d5db;
+  border-radius:12px;
+  padding:14px;
+  margin-bottom:10px;
+  cursor:pointer;
+  background:#fff
+}
+.option.selected{background:#e0e7ff;border-color:#6366f1}
+.option.correct{background:#dcfce7;border-color:#22c55e}
+.option.wrong{background:#fee2e2;border-color:#ef4444}
+.main-btn{
+  width:100%;
+  padding:14px;
+  border:none;
+  border-radius:12px;
+  background:#4f46e5;
+  color:#fff;
+  font-weight:bold;
+  font-size:16px;
+  cursor:pointer
+}
+.main-btn:disabled{background:#9ca3af}
+.progress{height:8px;background:#e5e7eb;border-radius:999px;overflow:hidden}
+.progress-bar{height:100%;background:#4f46e5}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="card">
+    <h1>📘 JLPT N4 文法模擬試験</h1>
+    <div id="testTabs"></div>
+  </div>
+
+  <div class="card" id="quiz"></div>
+</div>
+
+<script>
+const tests = [
+  {
+    title: "第1回",
+    questions: [
+      { q: "毎朝6時(　　)起きます。", opts: ["で","に","を","が"], correct: 1, explanation: "時刻には助詞「に」を使います。" },
+      { q: "この本は私(　　)友達にもらいました。", opts: ["の","を","に","と"], correct: 0, explanation: "所有・関係を示すには「の」を使います。" }
+    ]
+  }
+];
+
+let t=0,q=0,sel=null,show=false,answers=[];
+
+const quiz=document.getElementById("quiz");
+const tabs=document.getElementById("testTabs");
+
+function renderTabs(){
+  tabs.innerHTML="";
+  tests.forEach((x,i)=>{
+    const b=document.createElement("button");
+    b.textContent=x.title;
+    b.className="test-btn"+(i===t?" active":"");
+    b.onclick=()=>{t=i;q=0;sel=null;show=false;answers=[];render()};
+    tabs.appendChild(b);
+  });
+}
+
+function render(){
+  const qs=tests[t].questions[q];
+  const progress=((q+1)/tests[t].questions.length)*100;
+
+  quiz.innerHTML=`
+  <p>もんだい ${q+1} / ${tests[t].questions.length}</p>
+  <div class="progress"><div class="progress-bar" style="width:${progress}%"></div></div>
+  <h2>${qs.q}</h2>
+
+  ${qs.opts.map((o,i)=>`
+    <div class="option
+      ${sel===i?" selected":""}
+      ${show&&i===qs.correct?" correct":""}
+      ${show&&sel===i&&i!==qs.correct?" wrong":""}"
+      onclick="${show?"":"select("+i+")"}">
+      ${i+1}. ${o}
+    </div>
+  `).join("")}
+
+  ${show?`
+    <p><b>${sel===qs.correct?"せいかい！":"まちがい"}</b></p>
+    <p>${qs.explanation}</p>
+    <button class="main-btn" onclick="next()">つぎへ</button>
+  `:`
+    <button class="main-btn" onclick="submit()" ${sel===null?"disabled":""}>
+      かいとうする
+    </button>
+  `}
+  `;
+}
+
+function select(i){sel=i;render()}
+function submit(){answers[q]=sel;show=true;render()}
+function next(){
+  if(q<tests[t].questions.length-1){
+    q++;sel=null;show=false;render()
+  }else{
+    quiz.innerHTML="<h2>テストかんりょう！</h2>";
+  }
+}
+
+renderTabs();
+render();
+</script>
+
+</body>
+</html>
