@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>医療用語 学習アプリ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-pink-50 to-red-100 min-h-screen p-2">
+    <div class="max-w-2xl mx-auto">
+        <div class="bg-white rounded-xl shadow-xl p-4 mb-2">
+            <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                    </svg>
+                    <h1 class="text-xl font-bold text-gray-800">医療用語</h1>
+                </div>
+                <button onclick="resetApp()" class="p-1.5 hover:bg-gray-100 rounded-lg transition">
+                    <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="flex gap-2 mb-3">
+                <button id="learnBtn" onclick="changeMode('learn')" class="flex-1 py-1.5 px-3 rounded-lg text-sm font-medium transition bg-red-600 text-white">
+                    学習モード
+                </button>
+                <button id="quizBtn" onclick="changeMode('quiz')" class="flex-1 py-1.5 px-3 rounded-lg text-sm font-medium transition bg-gray-100 text-gray-700 hover:bg-gray-200">
+                    クイズモード
+                </button>
+            </div>
+
+            <div class="mb-3">
+                <div class="flex justify-between text-xs text-gray-600 mb-1">
+                    <span id="progressText">1 / 30</span>
+                    <span id="scoreText"></span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-1.5">
+                    <div id="progressBar" class="bg-red-600 h-1.5 rounded-full transition-all duration-300" style="width: 3.33%"></div>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-br from-red-50 to-pink-50 rounded-xl p-6 mb-3">
+                <div id="categoryBadge" class="inline-block px-3 py-1 bg-red-100 text-red-800 text-xs font-semibold rounded-full mb-3">体の部位</div>
+                <div id="wordText" class="text-3xl font-bold text-red-900 mb-2">心臓</div>
+                <div id="readingText" class="text-lg text-gray-600 mb-3">（しんぞう）</div>
+                <div id="answerArea" class="space-y-2"></div>
+            </div>
+
+            <div id="buttonArea"></div>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-lg p-2 text-center text-xs text-gray-600">
+            <p>全30問 | 医療用語学習</p>
+        </div>
+    </div>
+
+    <script>
+        const vocabulary = [
+            // 体の部位
+            { word: '心臓', reading: 'しんぞう', category: '体の部位', meaning: '血液を全身に送る臓器', chinese: '心脏，向全身输送血液的器官' },
+            { word: '肺', reading: 'はい', category: '体の部位', meaning: '呼吸をする臓器', chinese: '肺，进行呼吸的器官' },
+            { word: '肝臓', reading: 'かんぞう', category: '体の部位', meaning: '栄養や毒を処理する', chinese: '肝脏，处理营养和毒素' },
+            { word: '腎臓', reading: 'じんぞう', category: '体の部位', meaning: '尿を作る臓器', chinese: '肾脏，制造尿液的器官' },
+            { word: '胃', reading: 'い', category: '体の部位', meaning: '食べ物を消化する', chinese: '胃，消化食物' },
+            { word: '腸', reading: 'ちょう', category: '体の部位', meaning: '栄養を吸収する', chinese: '肠，吸收营养' },
+            { word: '内臓', reading: 'ないぞう', category: '体の部位', meaning: '体の中の臓器', chinese: '内脏，体内的器官' },
+            { word: '脳', reading: 'のう', category: '体の部位', meaning: '体の命令を出す', chinese: '大脑，发出身体指令' },
+            { word: '血管', reading: 'けっかん', category: '体の部位', meaning: '血液が流れる管', chinese: '血管，血液流动的管道' },
+            { word: '筋肉', reading: 'きんにく', category: '体の部位', meaning: '体を動かす', chinese: '肌肉，使身体运动' },
+            
+            // 医療用語
+            { word: '症状', reading: 'しょうじょう', category: '医療用語', meaning: '病気のあらわれ', chinese: '症状，疾病的表现' },
+            { word: '診断', reading: 'しんだん', category: '医療用語', meaning: '病気を決める', chinese: '诊断，确定疾病' },
+            { word: '治療', reading: 'ちりょう', category: '医療用語', meaning: '病気をなおす', chinese: '治疗，治愈疾病' },
+            { word: '検査', reading: 'けんさ', category: '医療用語', meaning: '体を調べる', chinese: '检查，检查身体' },
+            { word: '手術', reading: 'しゅじゅつ', category: '医療用語', meaning: '体を切る治療', chinese: '手术，切开身体进行治疗' },
+            { word: '点滴', reading: 'てんてき', category: '医療用語', meaning: '血管に薬を入れる', chinese: '点滴，将药物注入血管' },
+            { word: '注射', reading: 'ちゅうしゃ', category: '医療用語', meaning: '薬を体に入れる', chinese: '注射，将药物注入体内' },
+            { word: '副作用', reading: 'ふくさよう', category: '医療用語', meaning: '薬のよくない反応', chinese: '副作用，药物的不良反应' },
+            { word: '感染', reading: 'かんせん', category: '医療用語', meaning: '菌が体に入る', chinese: '感染，细菌进入体内' },
+            { word: '看護', reading: 'かんご', category: '医療用語', meaning: '患者を支える', chinese: '护理，照顾患者' },
+            
+            // 症状
+            { word: '発熱', reading: 'はつねつ', category: '症状', meaning: '熱が出ること', chinese: '发热，出现发烧' },
+            { word: '痛み', reading: 'いたみ', category: '症状', meaning: '体がいたいこと', chinese: '疼痛，身体疼痛' },
+            { word: '吐き気', reading: 'はきけ', category: '症状', meaning: '吐きそうな感じ', chinese: '恶心，想吐的感觉' },
+            { word: '下痢', reading: 'げり', category: '症状', meaning: '水のような便', chinese: '腹泻，水样便' },
+            { word: '便秘', reading: 'べんぴ', category: '症状', meaning: '便が出にくい', chinese: '便秘，排便困难' },
+            
+            // 基本動作・測定
+            { word: '呼吸', reading: 'こきゅう', category: '基本動作', meaning: '息をすること', chinese: '呼吸，进行呼吸' },
+            { word: '血圧', reading: 'けつあつ', category: '測定', meaning: '血の圧力', chinese: '血压，血液的压力' },
+            { word: '体温', reading: 'たいおん', category: '測定', meaning: '体の温度', chinese: '体温，身体的温度' },
+            { word: '脈拍', reading: 'みゃくはく', category: '測定', meaning: '心臓のリズム', chinese: '脉搏，心脏的节奏' },
+            { word: '血液', reading: 'けつえき', category: '体の部位', meaning: '体を流れる赤い液体', chinese: '血液，在体内流动的红色液体' }
+        ];
+
+        let currentIdx = 0;
+        let appMode = 'learn';
+        let correctCount = 0;
+        let totalCount = 0;
+        let isAnswered = false;
+        let userAnswer = null;
+        let shuffledOptions = [];
+
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        function generateOptions(correctReading) {
+            const allReadings = ['しんぞう', 'はい', 'かんぞう', 'じんぞう', 'い', 'ちょう', 'ないぞう', 'のう', 'けっかん', 'きんにく', 
+                                'しょうじょう', 'しんだん', 'ちりょう', 'けんさ', 'しゅじゅつ', 'てんてき', 'ちゅうしゃ', 'ふくさよう', 'かんせん', 'かんご',
+                                'はつねつ', 'いたみ', 'はきけ', 'げり', 'べんぴ', 'こきゅう', 'けつあつ', 'たいおん', 'みゃくはく', 'けつえき'];
+            
+            const wrongOptions = allReadings.filter(r => r !== correctReading);
+            const shuffledWrong = shuffleArray(wrongOptions);
+            const options = [correctReading, shuffledWrong[0], shuffledWrong[1]];
+            return shuffleArray(options);
+        }
+
+        function render() {
+            const v = vocabulary[currentIdx];
+            document.getElementById('categoryBadge').textContent = v.category;
+            document.getElementById('wordText').textContent = v.word;
+            document.getElementById('readingText').textContent = `（${v.reading}）`;
+            document.getElementById('progressText').textContent = `${currentIdx + 1} / ${vocabulary.length}`;
+            document.getElementById('progressBar').style.width = `${((currentIdx + 1) / vocabulary.length) * 100}%`;
+            
+            if (appMode === 'quiz' && totalCount > 0) {
+                document.getElementById('scoreText').textContent = `正解率: ${Math.round((correctCount / totalCount) * 100)}%`;
+            } else {
+                document.getElementById('scoreText').textContent = '';
+            }
+
+            if (appMode === 'learn') {
+                document.getElementById('answerArea').innerHTML = `
+                    <div class="bg-white rounded-lg p-4 shadow-sm">
+                        <div class="text-base text-gray-700 leading-relaxed mb-2">${v.meaning}</div>
+                        <div class="text-sm text-blue-600 leading-relaxed">${v.chinese}</div>
+                    </div>
+                `;
+            } else if (isAnswered) {
+                document.getElementById('answerArea').innerHTML = `
+                    <div class="bg-white rounded-lg p-4 shadow-sm">
+                        <div class="text-base text-gray-700 leading-relaxed mb-2">${v.meaning}</div>
+                        <div class="text-sm text-blue-600 leading-relaxed">${v.chinese}</div>
+                    </div>
+                `;
+            } else {
+                document.getElementById('answerArea').innerHTML = '';
+            }
+
+            renderButtons();
+        }
+
+        function renderButtons() {
+            const v = vocabulary[currentIdx];
+            const btnArea = document.getElementById('buttonArea');
+            
+            if (appMode === 'learn') {
+                btnArea.innerHTML = `
+                    <div class="flex gap-2">
+                        <button onclick="goPrev()" ${currentIdx === 0 ? 'disabled' : ''} 
+                            class="flex-1 py-2 px-4 text-sm bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition">
+                            前へ
+                        </button>
+                        <button onclick="goNext()" ${currentIdx === vocabulary.length - 1 ? 'disabled' : ''} 
+                            class="flex-1 py-2 px-4 text-sm bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition">
+                            次へ
+                        </button>
+                    </div>
+                `;
+            } else {
+                if (!isAnswered) {
+                    if (shuffledOptions.length === 0) {
+                        shuffledOptions = generateOptions(v.reading);
+                    }
+                    btnArea.innerHTML = `
+                        <div class="space-y-2">
+                            <p class="text-center text-sm text-gray-600 mb-2">${v.word} の読み方は？</p>
+                            <div class="space-y-2">
+                                ${shuffledOptions.map(opt => `
+                                    <button onclick="selectAnswer('${opt}')" 
+                                        class="w-full py-3 px-4 text-lg bg-red-100 text-red-900 rounded-lg font-medium hover:bg-red-200 transition text-center">
+                                        ${opt}
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                } else if (userAnswer === v.reading) {
+                    btnArea.innerHTML = `
+                        <div class="text-center">
+                            <div class="text-lg font-bold text-green-600">✓ 正解!</div>
+                        </div>
+                    `;
+                } else {
+                    btnArea.innerHTML = `
+                        <div class="space-y-2">
+                            <div class="text-center">
+                                <div class="text-lg font-bold text-red-600 mb-1">✗ 不正解</div>
+                                <div class="text-base text-gray-700 mb-2">
+                                    正解: <span class="text-red-700 font-semibold text-xl">${v.reading}</span>
+                                </div>
+                            </div>
+                            <button onclick="retry()" 
+                                class="w-full py-2 px-4 text-sm bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition">
+                                もう一度挑戦
+                            </button>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        function changeMode(newMode) {
+            appMode = newMode;
+            isAnswered = false;
+            userAnswer = null;
+            currentIdx = 0;
+            
+            document.getElementById('learnBtn').className = appMode === 'learn' 
+                ? 'flex-1 py-1.5 px-3 rounded-lg text-sm font-medium transition bg-red-600 text-white'
+                : 'flex-1 py-1.5 px-3 rounded-lg text-sm font-medium transition bg-gray-100 text-gray-700 hover:bg-gray-200';
+            
+            document.getElementById('quizBtn').className = appMode === 'quiz'
+                ? 'flex-1 py-1.5 px-3 rounded-lg text-sm font-medium transition bg-red-600 text-white'
+                : 'flex-1 py-1.5 px-3 rounded-lg text-sm font-medium transition bg-gray-100 text-gray-700 hover:bg-gray-200';
+            
+            render();
+        }
+
+        function goNext() {
+            if (currentIdx < vocabulary.length - 1) {
+                currentIdx++;
+                isAnswered = false;
+                shuffledOptions = [];
+                render();
+            }
+        }
+
+        function goPrev() {
+            if (currentIdx > 0) {
+                currentIdx--;
+                isAnswered = false;
+                shuffledOptions = [];
+                render();
+            }
+        }
+
+        function selectAnswer(ans) {
+            userAnswer = ans;
+            const correct = (userAnswer === vocabulary[currentIdx].reading);
+            isAnswered = true;
+            render();
+            
+            if (correct) {
+                correctCount++;
+                totalCount++;
+                setTimeout(() => {
+                    if (currentIdx < vocabulary.length - 1) {
+                        currentIdx++;
+                        isAnswered = false;
+                        userAnswer = null;
+                        shuffledOptions = [];
+                        render();
+                    }
+                }, 800);
+            } else {
+                totalCount++;
+            }
+        }
+
+        function retry() {
+            isAnswered = false;
+            userAnswer = null;
+            shuffledOptions = [];
+            render();
+        }
+
+        function resetApp() {
+            currentIdx = 0;
+            isAnswered = false;
+            correctCount = 0;
+            totalCount = 0;
+            userAnswer = null;
+            shuffledOptions = [];
+            render();
+        }
+
+        render();
+    </script>
+</body>
+</html>
