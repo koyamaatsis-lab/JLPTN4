@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JLPT 漢字学習アプリ</title>
+    <script crossorigin src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState } = React;
+
+        function KanjiApp() {
+          const [mode, setMode] = useState('menu');
+          const [currentIndex, setCurrentIndex] = useState(0);
+          const [selectedAnswer, setSelectedAnswer] = useState(null);
+          const [showResult, setShowResult] = useState(false);
+          const [score, setScore] = useState(0);
+          const [quizCompleted, setQuizCompleted] = useState(false);
+          const [wrongAnswers, setWrongAnswers] = useState([]);
+
+          const vocabulary = [
+            { kanji: "易しい", reading: "やさしい", meaning: "easy", vietnamese: "dễ" },
+            { kanji: "複雑な", reading: "ふくざつな", meaning: "complex", vietnamese: "phức tạp" },
+            { kanji: "貿易", reading: "ぼうえき", meaning: "trade", vietnamese: "thương mại" },
+            { kanji: "お湯", reading: "おゆ", meaning: "hot water", vietnamese: "nước nóng" },
+            { kanji: "太陽", reading: "たいよう", meaning: "sun", vietnamese: "mặt trời" },
+            { kanji: "陽気な", reading: "ようきな", meaning: "cheerful", vietnamese: "vui vẻ" },
+            { kanji: "予定", reading: "よてい", meaning: "schedule", vietnamese: "dự định" },
+            { kanji: "予報", reading: "よほう", meaning: "forecast", vietnamese: "dự báo" },
+            { kanji: "予習", reading: "よしゅう", meaning: "preparation (for class)", vietnamese: "chuẩn bị bài" },
+            { kanji: "予備校", reading: "よびこう", meaning: "cram school", vietnamese: "trường luyện thi" },
+            { kanji: "順番", reading: "じゅんばん", meaning: "order; turn", vietnamese: "thứ tự" },
+            { kanji: "序盤", reading: "じょばん", meaning: "opening stage", vietnamese: "giai đoạn đầu" },
+            { kanji: "預ける", reading: "あずける", meaning: "deposit; leave with", vietnamese: "gửi; giao phó" },
+            { kanji: "預金", reading: "よきん", meaning: "savings; deposit", vietnamese: "tiền tiết kiệm" },
+            { kanji: "預かる", reading: "あずかる", meaning: "keep; take care of", vietnamese: "giữ; chăm sóc" },
+            { kanji: "巨大な", reading: "きょだいな", meaning: "huge", vietnamese: "khổng lồ" },
+            { kanji: "巨人", reading: "きょじん", meaning: "giant", vietnamese: "người khổng lồ" },
+            { kanji: "拒む", reading: "こばむ", meaning: "refuse", vietnamese: "từ chối" },
+            { kanji: "拒否する", reading: "きょひする", meaning: "reject", vietnamese: "từ chối" },
+            { kanji: "距離", reading: "きょり", meaning: "distance", vietnamese: "khoảng cách" },
+            { kanji: "長距離", reading: "ちょうきょり", meaning: "long distance", vietnamese: "cự ly dài" },
+            { kanji: "原則", reading: "げんそく", meaning: "principle", vietnamese: "nguyên tắc" },
+            { kanji: "規則", reading: "きそく", meaning: "rule", vietnamese: "nội quy" },
+            { kanji: "側", reading: "がわ", meaning: "side", vietnamese: "phía" },
+            { kanji: "右側", reading: "みぎがわ", meaning: "right side", vietnamese: "bên phải" },
+            { kanji: "予測する", reading: "よそくする", meaning: "predict", vietnamese: "dự đoán" },
+            { kanji: "計測する", reading: "けいそくする", meaning: "measure", vietnamese: "đo" },
+            { kanji: "計測器", reading: "けいそくき", meaning: "measuring instrument", vietnamese: "thiết bị đo" },
+            { kanji: "測る", reading: "はかる", meaning: "measure", vietnamese: "đo" },
+            { kanji: "官僚", reading: "かんりょう", meaning: "bureaucrat", vietnamese: "quan chức chính phủ" },
+            { kanji: "外交官", reading: "がいこうかん", meaning: "diplomat", vietnamese: "nhà ngoại giao" },
+            { kanji: "官庁", reading: "かんちょう", meaning: "government office", vietnamese: "cơ quan nhà nước" },
+            { kanji: "水道", reading: "すいどう", meaning: "water supply", vietnamese: "nước máy" },
+            { kanji: "管理職", reading: "かんりしょく", meaning: "managerial position", vietnamese: "chức quản lý" },
+            { kanji: "保管する", reading: "ほかんする", meaning: "store; keep", vietnamese: "bảo quản" },
+            { kanji: "美術館", reading: "びじゅつかん", meaning: "art museum", vietnamese: "bảo tàng mỹ thuật" },
+            { kanji: "図書館", reading: "としょかん", meaning: "library", vietnamese: "thư viện" },
+            { kanji: "館", reading: "かん", meaning: "building; hall", vietnamese: "tòa nhà" },
+            { kanji: "追求", reading: "ついきゅう", meaning: "pursuit", vietnamese: "theo đuổi" },
+            { kanji: "追いかける", reading: "おいかける", meaning: "chase", vietnamese: "theo đuổi" },
+            { kanji: "追突", reading: "ついとつ", meaning: "rear-end collision", vietnamese: "đâm từ phía sau" },
+            { kanji: "教師", reading: "きょうし", meaning: "teacher", vietnamese: "giáo viên" },
+            { kanji: "調理師", reading: "ちょうりし", meaning: "cook; chef", vietnamese: "đầu bếp" },
+            { kanji: "作曲する", reading: "さっきょくする", meaning: "compose (music)", vietnamese: "sáng tác nhạc" },
+            { kanji: "曲がる", reading: "まがる", meaning: "turn; bend", vietnamese: "rẽ" },
+            { kanji: "一曲", reading: "いっきょく", meaning: "one song", vietnamese: "một bài hát" }
+          ];
+
+          const generateQuizOptions = (correctIndex) => {
+            const options = [vocabulary[correctIndex].reading];
+            const usedIndices = [correctIndex];
+            
+            while (options.length < 4) {
+              const randomIndex = Math.floor(Math.random() * vocabulary.length);
+              if (!usedIndices.includes(randomIndex)) {
+                options.push(vocabulary[randomIndex].reading);
+                usedIndices.push(randomIndex);
+              }
+            }
+            
+            return options.sort(() => Math.random() - 0.5);
+          };
+
+          const [quizOptions] = useState(() => 
+            vocabulary.map((_, index) => generateQuizOptions(index))
+          );
+
+          const startMode = (selectedMode) => {
+            setMode(selectedMode);
+            setCurrentIndex(0);
+            setSelectedAnswer(null);
+            setShowResult(false);
+            setScore(0);
+            setQuizCompleted(false);
+            setWrongAnswers([]);
+          };
+
+          const handleQuizAnswer = (answer) => {
+            setSelectedAnswer(answer);
+            setShowResult(true);
+            
+            const isCorrect = answer === vocabulary[currentIndex].reading;
+            
+            if (isCorrect) {
+              setScore(score + 1);
+            } else {
+              setWrongAnswers([...wrongAnswers, currentIndex]);
+            }
+          };
+
+          const handleQuizNext = () => {
+            if (currentIndex < vocabulary.length - 1) {
+              setCurrentIndex(currentIndex + 1);
+              setSelectedAnswer(null);
+              setShowResult(false);
+            } else {
+              setQuizCompleted(true);
+            }
+          };
+
+          if (mode === 'menu') {
+            return (
+              <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4 flex items-center justify-center">
+                <div className="max-w-2xl w-full">
+                  <div className="text-center mb-8">
+                    <h1 className="text-4xl font-bold text-blue-800 mb-2">JLPT</h1>
+                    <h2 className="text-3xl font-bold text-indigo-600 mb-4">かんじがくしゅう</h2>
+                    <p className="text-gray-600">{vocabulary.length}このたんごをまなぼう！</p>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <button
+                      onClick={() => startMode('study')}
+                      className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1"
+                    >
+                      <div className="text-center">
+                        <div className="text-6xl mb-4">📖</div>
+                        <h3 className="text-2xl font-bold text-gray-800 mb-2">がくしゅうモード</h3>
+                        <p className="text-gray-600">かんじのよみかたといみをみる</p>
+                      </div>
+                    </button>
+
+                    <button
+                      onClick={() => startMode('quiz')}
+                      className="bg-white p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1"
+                    >
+                      <div className="text-center">
+                        <div className="text-6xl mb-4">🧠</div>
+                        <h3 className="text-2xl font-bold text-gray-800 mb-2">クイズモード</h3>
+                        <p className="text-gray-600">かんじのもんだいにこたえる</p>
+                      </div>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          }
+
+          if (mode === 'study') {
+            const current = vocabulary[currentIndex];
+            
+            return (
+              <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+                <div className="max-w-3xl mx-auto">
+                  <div className="mb-4">
+                    <button
+                      onClick={() => setMode('menu')}
+                      className="px-4 py-2 bg-white rounded-lg shadow hover:shadow-md transition-all"
+                    >
+                      ← メニューにもどる
+                    </button>
+                  </div>
+
+                  <div className="bg-white rounded-2xl shadow-lg p-8">
+                    <div className="text-center mb-6">
+                      <div className="flex justify-between items-center mb-4">
+                        <span className="text-sm text-gray-600">がくしゅうモード</span>
+                        <span className="text-sm font-bold text-indigo-600">
+                          {currentIndex + 1} / {vocabulary.length}
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2 mb-6">
+                        <div
+                          className="bg-indigo-600 h-2 rounded-full transition-all"
+                          style={{width: ((currentIndex + 1) / vocabulary.length * 100) + '%'}}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="text-center mb-8">
+                      <h2 className="text-6xl font-bold text-indigo-600 mb-8">{current.kanji}</h2>
+                      
+                      <div className="bg-blue-50 p-6 rounded-xl mb-4">
+                        <p className="text-gray-600 text-sm mb-2">よみかた</p>
+                        <p className="text-3xl font-bold text-gray-800">{current.reading}</p>
+                      </div>
+
+                      <div className="bg-green-50 p-6 rounded-xl mb-4">
+                        <p className="text-gray-600 text-sm mb-2">English</p>
+                        <p className="text-xl text-gray-800">{current.meaning}</p>
+                      </div>
+
+                      <div className="bg-purple-50 p-6 rounded-xl">
+                        <p className="text-gray-600 text-sm mb-2">Tiếng Việt</p>
+                        <p className="text-xl text-gray-800">{current.vietnamese}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-4">
+                      <button
+                        onClick={() => currentIndex > 0 && setCurrentIndex(currentIndex - 1)}
+                        disabled={currentIndex === 0}
+                        className={'flex-1 py-3 rounded-lg font-bold transition-all ' + (currentIndex === 0 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-indigo-600 text-white hover:bg-indigo-700')}
+                      >
+                        ← まえへ
+                      </button>
+                      
+                      <button
+                        onClick={() => currentIndex < vocabulary.length - 1 && setCurrentIndex(currentIndex + 1)}
+                        disabled={currentIndex === vocabulary.length - 1}
+                        className={'flex-1 py-3 rounded-lg font-bold transition-all ' + (currentIndex === vocabulary.length - 1 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-indigo-600 text-white hover:bg-indigo-700')}
+                      >
+                        つぎへ →
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          }
+
+          if (quizCompleted) {
+            const percentage = Math.round((score / vocabulary.length) * 100);
+            
+            return (
+              <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+                <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-lg p-8">
+                  <div className="text-center">
+                    <div className="text-8xl mb-4">🏆</div>
+                    <h2 className="text-3xl font-bold mb-4 text-gray-800">クイズかんりょう！</h2>
+                    <div className="mb-6">
+                      <p className="text-6xl font-bold text-indigo-600 mb-2">
+                        {score}/{vocabulary.length}
+                      </p>
+                      <p className="text-2xl text-gray-600">せいかいりつ: {percentage}%</p>
+                    </div>
+
+                    {wrongAnswers.length > 0 && (
+                      <div className="mb-6 p-4 bg-red-50 rounded-lg max-h-96 overflow-y-auto">
+                        <h3 className="font-bold mb-2 text-red-800">まちがえたもんだい</h3>
+                        <div className="space-y-2">
+                          {wrongAnswers.map((index) => (
+                            <div key={index} className="text-left p-3 bg-white rounded">
+                              <div className="font-bold text-indigo-600 text-xl mb-1">{vocabulary[index].kanji}</div>
+                              <div className="text-gray-700">よみかた: {vocabulary[index].reading}</div>
+                              <div className="text-sm text-gray-600">{vocabulary[index].vietnamese}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="flex gap-4 justify-center">
+                      <button
+                        onClick={() => {
+                          setCurrentIndex(0);
+                          setSelectedAnswer(null);
+                          setShowResult(false);
+                          setScore(0);
+                          setQuizCompleted(false);
+                          setWrongAnswers([]);
+                        }}
+                        className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                      >
+                        🔄 もういちど
+                      </button>
+                      <button
+                        onClick={() => setMode('menu')}
+                        className="px-6 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+                      >
+                        メニューへ
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          }
+
+          const current = vocabulary[currentIndex];
+          const options = quizOptions[currentIndex];
+          const isCorrect = selectedAnswer === current.reading;
+
+          return (
+            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
+              <div className="max-w-3xl mx-auto">
+                <div className="mb-4">
+                  <button
+                    onClick={() => setMode('menu')}
+                    className="px-4 py-2 bg-white rounded-lg shadow hover:shadow-md transition-all"
+                  >
+                    ← メニューにもどる
+                  </button>
+                </div>
+
+                <div className="bg-white rounded-2xl shadow-lg p-8">
+                  <div className="mb-6">
+                    <div className="flex justify-between items-center mb-4">
+                      <span className="text-sm text-gray-600">クイズモード</span>
+                      <span className="text-sm font-bold text-indigo-600">
+                        もんだい {currentIndex + 1} / {vocabulary.length}
+                      </span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div
+                        className="bg-indigo-600 h-2 rounded-full transition-all"
+                        style={{width: ((currentIndex + 1) / vocabulary.length * 100) + '%'}}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="text-center mb-8">
+                    <h2 className="text-7xl font-bold text-indigo-600 mb-6">{current.kanji}</h2>
+                    <p className="text-xl text-gray-600">このよみかたはなんですか？</p>
+                  </div>
+
+                  <div className="space-y-3 mb-6">
+                    {options.map((option, index) => (
+                      <button
+                        key={index}
+                        onClick={() => !showResult && handleQuizAnswer(option)}
+                        disabled={showResult}
+                        className={'w-full p-4 text-left rounded-lg border-2 transition-all ' + (
+                          showResult
+                            ? option === current.reading
+                              ? 'bg-green-100 border-green-500'
+                              : selectedAnswer === option
+                              ? 'bg-red-100 border-red-500'
+                              : 'bg-gray-50 border-gray-200'
+                            : selectedAnswer === option
+                            ? 'bg-indigo-100 border-indigo-500'
+                            : 'bg-white border-gray-300 hover:border-indigo-300'
+                        )}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center font-bold">
+                            {index + 1}
+                          </span>
+                          <span className="text-xl">{option}</span>
+                          {showResult && option === current.reading && (
+                            <span className="ml-auto text-2xl">✓</span>
+                          )}
+                          {showResult && selectedAnswer === option && option !== current.reading && (
+                            <span className="ml-auto text-2xl">✗</span>
+                          )}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+
+                  {showResult && (
+                    <div className={'p-4 rounded-lg mb-6 ' + (isCorrect ? 'bg-green-50' : 'bg-red-50')}>
+                      <p className="font-bold mb-2 text-lg">
+                        {isCorrect ? '✓ せいかい！' : '✗ まちがい'}
+                      </p>
+                      <div className="text-gray-700">
+                        <p className="mb-1">English: {current.meaning}</p>
+                        <p>Tiếng Việt: {current.vietnamese}</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {showResult && (
+                    <button
+                      onClick={handleQuizNext}
+                      className="w-full py-3 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700"
+                    >
+                      {currentIndex < vocabulary.length - 1 ? 'つぎのもんだいへ →' : 'けっかをみる'}
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        ReactDOM.render(<KanjiApp />, document.getElementById('root'));
+    </script>
+</body>
+</html>
